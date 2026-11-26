@@ -18,7 +18,8 @@ export const assets = createAssetServer({
     'app/lib/utils.ts',
     'app/features/book/book-constants.ts',
   ],
-  allowPackages: ['remix', 'clsx', 'tailwind-merge'],
+  allowPackages: ['remix', 'clsx', 'tailwind-merge', '@fontsource-variable/geist', '@fontsource-variable/geist-mono'],
+  files: { extensions: ['.woff2'] },
   sourceMaps: isDevelopment ? 'external' : undefined,
   minify: !isDevelopment,
   fingerprint: isProduction,
@@ -27,5 +28,9 @@ export const assets = createAssetServer({
 
 export const scriptEntry = await assets.getScriptEntry('app/actions/public/entry.ts')
 export const stylesheetHref = await assets.getHref('app/styles/public/app.css')
+export const fontPreloadHrefs = await Promise.all([
+  assets.getHref('node_modules/@fontsource-variable/geist/files/geist-latin-wght-normal.woff2'),
+  assets.getHref('node_modules/@fontsource-variable/geist-mono/files/geist-mono-latin-wght-normal.woff2'),
+])
 
 export const publicFiles = staticFiles('./public', { index: false })

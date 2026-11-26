@@ -24,6 +24,18 @@ Copy `.env.example` to `.env`.
 | Netlify | https://remix3-books.netlify.app | `NETLIFY=1` |
 | Cloudflare Workers | https://remix3-books.to-email-max.workers.dev (not deployed yet: the account is at the 100-Worker limit) | `CLOUDFLARE=1` (or `WORKERS_CI`, set by Workers Builds) |
 
+### `optimized` branch
+
+| Host | URL |
+| --- | --- |
+| Vercel | https://remix3-books-optimized.vercel.app |
+| Netlify | https://remix3-books-max-optimized.netlify.app |
+| Cloudflare Workers | https://remix3-books-optimized.to-email-max.workers.dev (not deployed yet: the account is at the 100-Worker limit) |
+
+See [OPTIMIZATIONS.md](OPTIMIZATIONS.md): streamed `<Frame>` regions, `data-rmx-prefetch`, self-hosted fonts through the asset server, immutable asset caching, and a catalog query cache.
+
+## How the build works
+
 Remix 3 has no build step or host adapters: its asset server compiles browser modules from source at request time, and the router is a plain `fetch(request)` handler. `scripts/build.ts` adapts that for serverless hosts:
 
 - snapshots the asset server's production output (fingerprinted modules, import maps, preloads) into `dist/client` for the host CDN,

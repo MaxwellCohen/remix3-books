@@ -4,6 +4,7 @@ import type { AssetServer, ScriptEntry } from 'remix/assets'
 // asset server's output to static files and swaps this module in for app/assets.ts.
 type AssetManifest = {
   entries: Record<string, ScriptEntry>
+  fontPreloadHrefs: string[]
   scriptEntry: ScriptEntry
   stylesheetHref: string
 }
@@ -14,6 +15,7 @@ const manifest = __ASSET_MANIFEST__
 
 export const scriptEntry = manifest.scriptEntry
 export const stylesheetHref = manifest.stylesheetHref
+export const fontPreloadHrefs = manifest.fontPreloadHrefs
 export const publicFiles = undefined
 
 export const assets: Pick<AssetServer, 'getScriptEntry' | 'fetch' | 'close'> = {

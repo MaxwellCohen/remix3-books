@@ -6,7 +6,7 @@ import { Icon } from '../components/ui/icon.tsx'
 import { BookSidebar } from '../features/book/components/book-sidebar.tsx'
 import { BookSearch } from '../features/book/components/public/book-search.tsx'
 import type { SearchParams } from '../lib/url-state.ts'
-import { scriptEntry, stylesheetHref } from '../assets.ts'
+import { fontPreloadHrefs, scriptEntry, stylesheetHref } from '../assets.ts'
 
 const SITE_NAME = 'Remix 3 Books'
 const DESCRIPTION =
@@ -17,13 +17,14 @@ const unsafeTheme = unsafeHTML(`(function(){try{var t=localStorage.getItem("them
 
 export interface DocumentProps {
   children?: RemixNode
+  head?: RemixNode
   searchParams: SearchParams
   title: string
 }
 
 export function Document(handle: Handle<DocumentProps>) {
   return () => {
-    let { children, searchParams, title } = handle.props
+    let { children, head, searchParams, title } = handle.props
     let { href, importMap, preloads } = scriptEntry
 
     return (
@@ -41,13 +42,11 @@ export function Document(handle: Handle<DocumentProps>) {
           <meta content={SITE_NAME} property="og:title" />
           <meta content="website" property="og:type" />
           <link href="/icon.svg" rel="icon" type="image/svg+xml" />
+          {fontPreloadHrefs.map((fontHref) => (
+            <link as="font" crossOrigin="anonymous" href={fontHref} key={fontHref} rel="preload" type="font/woff2" />
+          ))}
           <link href={stylesheetHref} rel="stylesheet" />
-          <link href="https://fonts.googleapis.com" rel="preconnect" />
-          <link crossOrigin="anonymous" href="https://fonts.gstatic.com" rel="preconnect" />
-          <link
-            href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap"
-            rel="stylesheet"
-          />
+          {head}
           <script innerHTML={unsafeTheme} />
           <ImportMap value={importMap} />
           {preloads.map((preloadHref) => (

@@ -29,6 +29,7 @@ export function BookPagination(handle: Handle<{ searchParams: SearchParams; tota
           <a
             aria-label="Previous page"
             class={stepClass}
+            data-rmx-prefetch="intent"
             href={buildHref(withPage(searchParams, currentPage - 1))}
           >
             <LinkStatus>
@@ -54,7 +55,7 @@ export function BookPagination(handle: Handle<{ searchParams: SearchParams; tota
         </p>
 
         {hasNext ? (
-          <a aria-label="Next page" class={stepClass} href={buildHref(withPage(searchParams, currentPage + 1))}>
+          <a aria-label="Next page" class={stepClass} data-rmx-prefetch="intent" href={buildHref(withPage(searchParams, currentPage + 1))}>
             <LinkStatus hint="start">
               Next
               <Icon class="size-4" name="chevron-right" />

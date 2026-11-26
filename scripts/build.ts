@@ -28,14 +28,14 @@ execFileSync(path.join(root, 'node_modules/.bin/tailwindcss'), [
 
 // 2. Snapshot browser assets
 env.NODE_ENV = 'production'
-const { assets, scriptEntry, stylesheetHref } = await import('../app/assets.ts')
+const { assets, fontPreloadHrefs, scriptEntry, stylesheetHref } = await import('../app/assets.ts')
 
 const clientEntryFiles = walk(path.join(root, 'app'))
   .filter((file) => /\/public\/[^/]+\.tsx?$/.test(file) && fs.readFileSync(file, 'utf8').includes('clientEntry('))
   .map((file) => path.relative(root, file))
 
 const entries: Record<string, unknown> = {}
-const queue = new Set<string>([stylesheetHref, ...urlsOf(scriptEntry)])
+const queue = new Set<string>([stylesheetHref, ...fontPreloadHrefs, ...urlsOf(scriptEntry)])
 for (const file of clientEntryFiles) {
   const entry = await assets.getScriptEntry(file)
   entries[file] = entry
@@ -76,7 +76,7 @@ for (const url of queue) {
 await assets.close()
 console.log(`snapshotted ${written.size} assets for ${clientEntryFiles.length} client entries`)
 
-const manifest = JSON.parse(toJsUrl(JSON.stringify({ entries, scriptEntry, stylesheetHref })))
+const manifest = JSON.parse(toJsUrl(JSON.stringify({ entries, fontPreloadHrefs, scriptEntry, stylesheetHref })))
 
 fs.cpSync(path.join(root, 'public'), clientDir, { recursive: true })
 
@@ -113,7 +113,13 @@ if (host === 'vercel') {
   fs.cpSync(clientDir, path.join(out, 'static'), { recursive: true })
   writeJson(path.join(out, 'config.json'), {
     version: 3,
-    routes: [{ handle: 'filesystem' }, { dest: '/index', src: '/(.*)' }],
+    routes: [
+      // Fingerprinted by the asset server, so safe to cache forever (public/_headers does
+      // the same on Netlify and Cloudflare).
+      { continue: true, headers: { 'cache-control': 'public, max-age=31536000, immutable' }, src: '^/assets/(.*)$' },
+      { handle: 'filesystem' },
+      { dest: '/index', src: '/(.*)' },
+    ],
   })
 }
 

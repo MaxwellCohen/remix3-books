@@ -13,6 +13,7 @@ export const BackToBooksLink = clientEntry(
     return () => (
       <a
         class={cn(linkClass, handle.props.class)}
+        data-rmx-prefetch="intent"
         href={buildHref(handle.props.searchParams)}
         mix={on('click', (event) => {
           // Prefer a real Back so the catalog restores its scroll position.
