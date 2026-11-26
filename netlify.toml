@@ -1,0 +1,14 @@
+[build]
+  command = "NETLIFY=1 pnpm build"
+  publish = "dist/client"
+  functions = "dist/netlify/functions"
+
+[build.environment]
+  NODE_VERSION = "24"
+
+[functions]
+  node_bundler = "none"
+
+[dev]
+  command = "pnpm dev"
+  port = 3000

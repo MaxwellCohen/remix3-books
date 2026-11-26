@@ -1,0 +1,36 @@
+{
+  "name": "remix3-books",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@neondatabase/serverless": "^1.2.1",
+    "clsx": "^2.1.1",
+    "drizzle-orm": "^0.45.4",
+    "remix": "3.3.0",
+    "tailwind-merge": "^3.7.1",
+    "thumbhash": "^0.1.1",
+    "unlazy": "^3.0.1"
+  },
+  "devDependencies": {
+    "@tailwindcss/cli": "^4.3.5",
+    "@types/node": "^26.6.11",
+    "esbuild": "^0.28.2",
+    "tailwindcss": "^4.3.5",
+    "typescript": "^7.0.2",
+    "wrangler": "^4.168.0"
+  },
+  "scripts": {
+    "dev": "pnpm build:css && (tailwindcss -i app/styles/global.css -o app/styles/public/app.css --watch=always & NODE_ENV=development node --env-file-if-exists=.env --watch --import remix/node-tsx server.ts)",
+    "build:css": "tailwindcss -i app/styles/global.css -o app/styles/public/app.css --minify",
+    "build": "node scripts/build.ts",
+    "start": "NODE_ENV=production node --env-file-if-exists=.env --import remix/node-tsx server.ts",
+    "typecheck": "tsc --noEmit",
+    "deploy:vercel": "VERCEL=1 pnpm build && vercel deploy --prebuilt --prod --yes",
+    "deploy:netlify": "NETLIFY=1 pnpm build && netlify deploy --prod --no-build",
+    "deploy:cloudflare": "CLOUDFLARE=1 pnpm build && wrangler deploy",
+    "preview:cloudflare": "CLOUDFLARE=1 pnpm build && wrangler dev"
+  },
+  "engines": {
+    "node": ">=24.3.0"
+  }
+}
