@@ -42,13 +42,14 @@ for (const file of clientEntryFiles) {
   for (const url of urlsOf(entry)) queue.add(url)
 }
 
-// Static hosts serve `.ts`/`.tsx` with a non-JavaScript MIME type, so compiled modules are
-// written with an extra `.js` extension, and Cloudflare redirects a raw `@` (the fingerprint
-// marker) to `%40`. Every reference to an asset is rewritten to match.
+// Asset URLs are rewritten (in file names and in every reference) for static hosts:
+// - `.ts`/`.tsx` is served with a non-JavaScript MIME type, so modules get an extra `.js`;
+// - Cloudflare redirects a raw `@` (the fingerprint marker) to `%40`;
+// - Netlify skips dot-directories (`node_modules/.pnpm`), and `+` is ambiguous in paths.
 const assetUrl = /\/assets\/[^"'`()\s]+/g
 const tsRelative = /(["'])(\.\.?\/[^"'`\s]+?\.(?:tsx?|mts|jsx))(?=["'])/g
 const fixUrl = (url: string) => {
-  const encoded = url.replaceAll('@', '%40')
+  const encoded = url.replaceAll('@', '%40').replace('/assets/npm/.pnpm/', '/assets/npm/pnpm/').replaceAll('%2B', '__')
   return /\.(?:tsx?|mts|jsx)$/.test(encoded) ? `${encoded}.js` : encoded
 }
 const toJsUrl = (text: string) => text.replace(assetUrl, fixUrl).replace(tsRelative, '$1$2.js')

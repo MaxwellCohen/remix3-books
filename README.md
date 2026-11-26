@@ -22,7 +22,7 @@ Copy `.env.example` to `.env`.
 | --- | --- | --- |
 | Vercel | https://remix3-books.vercel.app | `VERCEL=1` (set by Vercel) |
 | Netlify | https://remix3-books.netlify.app | `NETLIFY=1` |
-| Cloudflare Workers | https://remix3-books.to-email-max.workers.dev | `CLOUDFLARE=1` (or `WORKERS_CI`, set by Workers Builds) |
+| Cloudflare Workers | https://remix3-books.to-email-max.workers.dev (not deployed yet: the account is at the 100-Worker limit) | `CLOUDFLARE=1` (or `WORKERS_CI`, set by Workers Builds) |
 
 Remix 3 has no build step or host adapters: its asset server compiles browser modules from source at request time, and the router is a plain `fetch(request)` handler. `scripts/build.ts` adapts that for serverless hosts:
 
@@ -30,5 +30,7 @@ Remix 3 has no build step or host adapters: its asset server compiles browser mo
 - bundles `router.fetch` with esbuild, swapping `app/assets.ts` for `app/assets.prebuilt.ts` (a manifest-backed `getScriptEntry`),
 - writes the host layout: Vercel Build Output API (`.vercel/output`), a Netlify function (`dist/netlify/functions/server`), or a Worker with static assets (`dist/worker`, `dist/client`).
 
+- Vercel and Netlify are connected to this repo: a push to `main` builds and deploys to both. Cloudflare is deployed with `pnpm deploy:cloudflare`.
+- Netlify's "built with Netlify" badge is turned off on the site: it injects a `<script>` after `</html>`, which breaks Remix's client navigation (it reconciles whole HTML documents).
 - `POSTGRES_URL` is set on every host (Vercel and Netlify environment variable, Cloudflare secret). Without it the app serves the preview catalog.
 - Deploys: `pnpm deploy:vercel`, `pnpm deploy:netlify`, `pnpm deploy:cloudflare`.
