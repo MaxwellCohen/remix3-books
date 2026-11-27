@@ -148,6 +148,14 @@ if (host === 'cloudflare') {
     external: ['node:*', 'cloudflare:*'],
     mainFields: ['module', 'main'],
     outfile: path.join(root, 'dist/worker/index.js'),
+    // Vercel/Netlify cache clients are only imported on their hosts and pull in Node builtins.
+    plugins: [...bundleOptions.plugins!, {
+      name: 'stub-host-caches',
+      setup(build) {
+        build.onResolve({ filter: /^@(vercel\/functions|netlify\/blobs)$/ }, (args) => ({ path: args.path, namespace: 'stub' }))
+        build.onLoad({ filter: /.*/, namespace: 'stub' }, () => ({ contents: 'export {}', loader: 'js' }))
+      },
+    }],
     platform: 'neutral',
     target: 'es2024',
   })
